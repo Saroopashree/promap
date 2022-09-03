@@ -10,7 +10,7 @@ import {
 } from "../recoil/atoms";
 import { getSessionToken } from "./lsService";
 
-const clearAppContents = () => {
+export const clearAppContents = () => {
   // Clear all items stored in localStorage
   localStorage.removeItem("currentUser");
   localStorage.removeItem("currentProject");

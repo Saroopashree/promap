@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import AdbIcon from "@mui/icons-material/Adb";
 import ArrowDown from "@mui/icons-material/ArrowDropDown";
-import apiService from "../services/apiService";
+import apiService, { clearAppContents } from "../services/apiService";
 import ProjectDialog from "../components/dialogs/project";
 import { useSnackbar } from "notistack";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -26,7 +26,7 @@ import {
 import { currentUserName } from "../services/lsService";
 
 const pages = [];
-const settings = [];
+const settings = [{ name: "Logout", value: "logout" }];
 
 const createItems = [
   { name: "Project", value: "project" },
@@ -175,11 +175,14 @@ const Layout = ({ children }) => {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
-                {settings.map((setting) => (
-                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                    <Typography textAlign="center">{setting}</Typography>
-                  </MenuItem>
-                ))}
+                <MenuItem
+                  onClick={() => {
+                    handleCloseUserMenu();
+                    clearAppContents();
+                  }}
+                >
+                  <Typography textAlign="center">Log Out</Typography>
+                </MenuItem>
               </Menu>
             </Box>
           </Toolbar>
