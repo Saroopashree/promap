@@ -9,9 +9,23 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "12.2.5",
+    "@emotion/react": "^11.10.4",
+    "@emotion/styled": "^11.10.4",
+    "@mui/icons-material": "^5.10.3",
+    "@mui/material": "^5.10.3",
+    "@mui/styles": "^5.10.3",
+    "axios": "^0.27.2",
+    "dotenv": "^16.0.2",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^4.9.1",
+    "next": "^12.2.6-canary.8",
+    "next-api-decorators": "^2.0.0",
+    "notistack": "^2.0.5",
+    "path-to-regexp": "^6.2.1",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "recoil": "^0.7.5",
+    "recoil-nexus": "^0.4.0"
   },
   "devDependencies": {
     "eslint": "8.23.0",
