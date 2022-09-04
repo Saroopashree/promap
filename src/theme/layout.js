@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AppBar,
   Box,
@@ -29,6 +29,7 @@ import { Place } from "@mui/icons-material";
 import PlanDialog from "../components/dialogs/plan";
 import TaskDialog from "../components/dialogs/task";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 const pages = [];
 const settings = [{ name: "Logout", value: "logout" }];
@@ -42,20 +43,27 @@ const createItems = [
 const Layout = ({ children }) => {
   const { enqueueSnackbar } = useSnackbar();
 
+  const router = useRouter();
+
   const [username, setUsername] = useState("");
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [anchorElCreate, setAnchorElCreate] = useState(null);
+  const [anchorElProject, setAnchorElProject] = useState(null);
 
   const [dialogType, setDialogType] = useState(null);
 
   const [projects, setProjects] = useRecoilState(allProjectsState);
-  const [activeProject, setActiveProject] =
+  const [activeProjectId, setActiveProjectId] =
     useRecoilState(activeProjectIdState);
   const [plans, setPlans] = useRecoilState(allPlansState);
   const [updateTaskCount, setUpdateTaskCount] = useRecoilState(
     updateTaskNotifierState
   );
+
+  const projectIdAndName = useMemo(() => {
+    return Object.fromEntries(projects.map((proj) => [proj.id, proj.name]));
+  }, [projects]);
 
   useEffect(() => {
     setUsername(currentUserName());
@@ -67,6 +75,13 @@ const Layout = ({ children }) => {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+  };
+
+  const handleOpenProjectMenu = (event) => {
+    setAnchorElProject(event.currentTarget);
+  };
+  const handleCloseProjectMenu = () => {
+    setAnchorElProject(null);
   };
 
   const handleOpenCreateMenu = (event) => {
@@ -87,6 +102,8 @@ const Layout = ({ children }) => {
         variant: "success",
       });
       setProjects([...projects, res.data]);
+      setActiveProjectId(res.data.id);
+      router.push(`/kanban/${res.data.id}`);
     });
   };
 
@@ -106,6 +123,12 @@ const Layout = ({ children }) => {
       });
       setUpdateTaskCount((prev) => prev + 1);
     });
+  };
+
+  const goToKanban = (projectId) => {
+    handleCloseProjectMenu();
+    setActiveProjectId(projectId);
+    router.push(`/kanban/${projectId}`);
   };
 
   return (
@@ -135,9 +158,32 @@ const Layout = ({ children }) => {
               </Typography>
             </Link>
 
-            {Boolean(activeProject) && (
-              <Typography variant="h6">{activeProject.name}</Typography>
+            {Boolean(activeProjectId) && (
+              <span
+                style={{ cursor: "pointer", marginLeft: "36px" }}
+                onClick={handleOpenProjectMenu}
+              >
+                <Typography variant="h6">
+                  {projectIdAndName[activeProjectId]}
+                </Typography>
+              </span>
             )}
+            <Menu
+              anchorEl={anchorElProject}
+              open={Boolean(anchorElProject)}
+              onClose={handleCloseProjectMenu}
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+              transformOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+              {Object.entries(projectIdAndName)
+                .filter(([id]) => id !== activeProjectId)
+                .map(([id, name]) => (
+                  <MenuItem key={id} onClick={() => goToKanban(id)}>
+                    {name}
+                  </MenuItem>
+                ))}
+            </Menu>
+
             <Button
               sx={{ ml: 4 }}
               color="secondary"
@@ -159,7 +205,7 @@ const Layout = ({ children }) => {
                   sx={{ width: 110 }}
                   key={item.value}
                   onClick={() => onCreateItemClick(item.value)}
-                  disabled={projects.length === 0}
+                  disabled={projects.length === 0 && item.value !== "project"}
                 >
                   {item.name}
                 </MenuItem>

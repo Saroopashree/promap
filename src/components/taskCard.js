@@ -83,8 +83,8 @@ const TaskCard = ({ task, markDone = false, index }) => {
   );
 
   const handleDelete = () => {
-    apiService.delete(`/tasks/${task.id}`).then(() => {
-      setTasksInKanban((prev) => prev.filter((t) => t.id !== task.id));
+    apiService.delete(`/api/task/${task.key}`).then(() => {
+      setTasksInKanban((prev) => prev.filter((t) => t.key !== task.key));
     });
   };
 

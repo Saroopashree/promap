@@ -6,6 +6,7 @@ import {
   Post,
   Delete,
   Body,
+  Query,
 } from "next-api-decorators";
 import JwtAuthGuard from "../../../server/jwtAuthGuard";
 import mongo from "../../../server/mongo";
@@ -18,7 +19,7 @@ class PlanRouter {
 
   @Get()
   @JwtAuthGuard()
-  async listAllPlans(@Param("projectId") projectId = null) {
+  async listAllPlans(@Query("projectId") projectId = null) {
     return await this.planService.listPlans(projectId);
   }
 
