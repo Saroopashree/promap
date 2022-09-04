@@ -16,6 +16,7 @@ import {
   activeProjectIdState,
   allPlansState,
   allProjectsState,
+  channelIdState,
   tasksInKanbanState,
   updateTaskNotifierState,
 } from "../../recoil/atoms";
@@ -23,6 +24,7 @@ import apiService from "../../services/apiService";
 import Layout from "../../theme/layout";
 import KanbanBoard from "../../components/kanbanBoard";
 import { useRouter } from "next/router";
+import { useChannelMessage } from "@onehop/react";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -63,6 +65,29 @@ const KanbanScreen = () => {
   const [tasksInBoard, setTasksInBoard] = useRecoilState(tasksInKanbanState);
   const [allProjects, setAllProjects] = useRecoilState(allProjectsState);
   const updateTaskNotifier = useRecoilValue(updateTaskNotifierState);
+  const channelId = useRecoilValue(channelIdState);
+
+  console.log("Channel ID: ", channelId);
+  // Hop Channel
+  useChannelMessage(channelId, "TASK_CREATED", (message) => {
+    debugger;
+    const check = tasksInBoard.find((task) => task.key === message.key);
+    if (check) return;
+    setTasksInBoard((tasks) => [...tasks, message]);
+  });
+  useChannelMessage(channelId, "TASK_UPDATED", (message) => {
+    debugger;
+    let newTasks = [...tasksInBoard];
+    const index = newTasks.findIndex((task) => task.key === message.key);
+    newTasks[index] = message;
+    setTasksInBoard(newTasks);
+  });
+  useChannelMessage(channelId, "TASK_DELETED", (message) => {
+    debugger;
+    setTasksInBoard((tasks) =>
+      tasks.filter((task) => task.key !== message.key)
+    );
+  });
 
   const activeProject = useMemo(() => {
     return allProjects.find((proj) => proj.id === projectId);

@@ -87,7 +87,6 @@ const PlanDialog = (props) => {
   };
 
   const handleCreate = () => {
-    debugger;
     props.handleCreate({
       name,
       description,

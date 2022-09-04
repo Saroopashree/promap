@@ -34,6 +34,7 @@ const useStyles = makeStyles((theme) =>
         alignItems: "center",
       },
       "& .task-name": {
+        width: "30ch",
         marginBlock: theme.spacing(1),
         overflow: "hidden",
         display: "-webkit-box",

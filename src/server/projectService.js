@@ -3,6 +3,7 @@ import { BadRequestException } from "next-api-decorators";
 
 class ProjectService {
   #client;
+
   constructor(mongoClient) {
     this.#client = mongoClient;
   }

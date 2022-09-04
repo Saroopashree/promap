@@ -8,6 +8,8 @@ export const sessionTokenState = atom({
   default: null,
 });
 
+export const channelIdState = atom({ key: "channelId", default: "" });
+
 export const allProjectsState = atom({ key: "allProjects", default: [] });
 
 export const activeProjectIdState = atom({

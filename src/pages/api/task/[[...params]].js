@@ -7,14 +7,22 @@ import {
   Delete,
   Body,
   Query,
+  Req,
+  Header,
 } from "next-api-decorators";
+import hop from "../../../server/hop";
 import JwtAuthGuard from "../../../server/jwtAuthGuard";
 import mongo from "../../../server/mongo";
 import TaskService from "../../../server/taskService";
 
+const jwt = require("jsonwebtoken");
+
+const dotenv = require("dotenv");
+dotenv.config();
+
 class TaskRouter {
   constructor() {
-    this.taskService = new TaskService(mongo);
+    this.taskService = new TaskService(mongo, hop);
   }
 
   @Get()
@@ -33,8 +41,10 @@ class TaskRouter {
 
   @Post()
   @JwtAuthGuard()
-  async createTask(@Body() body) {
-    return await this.taskService.createTask(body);
+  async createTask(@Header("authorization") authHeader, @Body() body) {
+    const token = authHeader.split(" ")[1];
+    const context = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    return await this.taskService.createTask(body, context.channelId);
   }
 
   @Put("/:key")
@@ -45,14 +55,26 @@ class TaskRouter {
 
   @Put("/:key/status")
   @JwtAuthGuard()
-  async updateTaskStatus(@Param("key") key, @Body() body) {
-    return await this.taskService.changeTaskStatus(key, body.status);
+  async updateTaskStatus(
+    @Header("authorization") authHeader,
+    @Param("key") key,
+    @Body() body
+  ) {
+    const token = authHeader.split(" ")[1];
+    const context = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    return await this.taskService.changeTaskStatus(
+      key,
+      body.status,
+      context.channelId
+    );
   }
 
   @Delete("/:key")
   @JwtAuthGuard()
-  async deleteTask(@Param("key") key) {
-    return await this.taskService.deleteTask(key);
+  async deleteTask(@Header("authorization") authHeader, @Param("key") key) {
+    const token = authHeader.split(" ")[1];
+    const context = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    return await this.taskService.deleteTask(key, context.channelId);
   }
 }
 

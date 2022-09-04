@@ -5,20 +5,30 @@ import {
   createHandler,
   Param,
   NotFoundException,
+  Req,
+  Header,
 } from "next-api-decorators";
+import hop from "../../../server/hop";
 import JwtAuthGuard from "../../../server/jwtAuthGuard";
 import mongo from "../../../server/mongo";
 import UserService from "../../../server/userService";
 
+const jwt = require("jsonwebtoken");
+
+const dotenv = require("dotenv");
+dotenv.config();
+
 class UserRouter {
   constructor() {
-    this.userService = new UserService(mongo);
+    this.userService = new UserService(mongo, hop);
   }
 
   @Get()
   @JwtAuthGuard()
-  async list() {
-    return await this.userService.listUsers();
+  async list(@Header("authorization") authHeader) {
+    const token = authHeader.split(" ")[1];
+    const context = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    return await this.userService.listUsers(context.email);
   }
 
   @Get("/:id")

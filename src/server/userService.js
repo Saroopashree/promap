@@ -1,3 +1,5 @@
+import ChannelService from "./channelService";
+
 const dotenv = require("dotenv");
 const { scryptSync, randomBytes, timingSafeEqual } = require("crypto");
 const jwt = require("jsonwebtoken");
@@ -6,9 +8,11 @@ dotenv.config();
 
 class UserService {
   #client;
+  #channelService;
 
-  constructor(mongoClient) {
+  constructor(mongoClient, hop) {
     this.#client = mongoClient;
+    this.#channelService = new ChannelService(mongoClient, hop);
   }
 
   #collection() {
@@ -22,6 +26,9 @@ class UserService {
     const users = this.#collection();
     const user = { email, username, password: hashedPassword, salt };
     await users.insertOne(user);
+
+    const domain = email.split("@")[1];
+    await this.#channelService.createCommunicationChannel(domain);
 
     return this.login(email, password);
   }
@@ -38,12 +45,22 @@ class UserService {
     if (
       timingSafeEqual(Buffer.from(hashedPassword), Buffer.from(user.password))
     ) {
+      const domain = email.split("@")[1];
+      const channel = await this.#channelService.getCommunicationChannel(
+        domain
+      );
+
       const userView = {
         id: user._id,
         email: user.email,
         username: user.username,
+        channelId: channel?.channelId,
       };
-      return { ...userView, token: this.generateAccessToken(userView) };
+
+      return {
+        ...userView,
+        token: this.generateAccessToken(userView),
+      };
     } else {
       return null;
     }
@@ -71,9 +88,14 @@ class UserService {
     }
   }
 
-  async listUsers() {
+  async listUsers(email) {
     const users = this.#collection();
-    const result = await users.find({}).toArray();
+
+    const domain = email.split("@")[1];
+    const result = await users
+      .find({ email: { $regex: `.*${domain}.*`, $options: "i" } })
+      .toArray();
+
     return result.map((user) => ({
       id: user._id,
       email: user.email,
@@ -87,6 +109,12 @@ class UserService {
     return result
       ? { id: result._id, email: result.email, username: result.username }
       : null;
+  }
+
+  async getCommunicationChannel(userId) {
+    const currUser = this.getUserById(userId);
+    const domain = (await currUser).email.split("@")[1];
+    return await this.#channelService.getCommunicationChannel(domain);
   }
 }
 

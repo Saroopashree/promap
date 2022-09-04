@@ -5,7 +5,7 @@ import { Box, Button, FormGroup, Tab, Tabs, TextField } from "@mui/material";
 import { makeStyles, createStyles } from "@mui/styles";
 import apiService from "../services/apiService";
 import { useRecoilState } from "recoil";
-import { sessionTokenState } from "../recoil/atoms";
+import { channelIdState, sessionTokenState } from "../recoil/atoms";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -48,6 +48,7 @@ const SignIn = () => {
   const [switchTab, setSwitchTab] = useState(0);
 
   const [token, setToken] = useRecoilState(sessionTokenState);
+  const [channelId, setChannelId] = useRecoilState(channelIdState);
 
   const pageTitle = useMemo(
     () => (switchTab === 0 ? "Sign In" : "Sign Up"),
@@ -58,6 +59,7 @@ const SignIn = () => {
     apiService.post("/api/user/login", { email, password }).then((res) => {
       localStorage.setItem("currentUser", JSON.stringify(res.data));
       setToken(res.data.token);
+      setChannelId(res.data.channelId);
       router.push("/");
     });
   };
@@ -68,6 +70,7 @@ const SignIn = () => {
       .then((res) => {
         localStorage.setItem("currentUser", JSON.stringify(res.data));
         setToken(res.data.token);
+        setChannelId(res.data.channelId);
         router.push("/");
       });
   };

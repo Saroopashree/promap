@@ -1,19 +1,22 @@
+import ChannelService from "./channelService";
 import ProjectService from "./projectService";
 
 class TaskService {
   #client;
   #projectService;
+  #channelService;
 
-  constructor(mongoClient) {
+  constructor(mongoClient, hop) {
     this.#client = mongoClient;
     this.#projectService = new ProjectService(mongoClient);
+    this.#channelService = new ChannelService(mongoClient, hop);
   }
 
   #collection() {
     return this.#client.db("promap").collection("tasks");
   }
 
-  async createTask(task) {
+  async createTask(task, channelId) {
     if (
       task.name === undefined ||
       task.name === "" ||
@@ -34,7 +37,9 @@ class TaskService {
       key: taskKey,
       status: defaultStatus,
     });
-    return this.getTaskByKey(taskKey);
+    const res = await this.getTaskByKey(taskKey);
+    this.#channelService.publishMessage(channelId, "TASK_CREATED", res);
+    return res;
   }
 
   async listTasks(projectId, plans = null) {
@@ -78,17 +83,23 @@ class TaskService {
     return this.getTaskByKey(taskKey);
   }
 
-  async changeTaskStatus(taskKey, status) {
+  async changeTaskStatus(taskKey, status, channelId) {
     await this.#collection().findOneAndUpdate(
       { key: taskKey },
       { $set: { status } },
       { returnOriginal: false }
     );
-    return this.getTaskByKey(taskKey);
+    const res = await this.getTaskByKey(taskKey);
+    this.#channelService.publishMessage(channelId, "TASK_UPDATED", res);
+    return res;
   }
 
-  async deleteTask(taskKey) {
-    return await this.#collection().findOneAndDelete({ key: taskKey });
+  async deleteTask(taskKey, channelId) {
+    const res = await this.#collection().findOneAndDelete({ key: taskKey });
+    this.#channelService.publishMessage(channelId, "TASK_DELETED", {
+      key: taskKey,
+    });
+    return res;
   }
 }
 

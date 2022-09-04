@@ -1,3 +1,4 @@
+import { hop } from "@onehop/client";
 import {
   createHandler,
   Body,
@@ -12,7 +13,7 @@ import ProjectService from "../../../server/projectService";
 
 class ProjectsRouter {
   constructor() {
-    this.projectService = new ProjectService(mongo);
+    this.projectService = new ProjectService(mongo, hop);
   }
 
   @Get()
