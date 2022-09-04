@@ -151,6 +151,7 @@ const KanbanScreen = () => {
               renderTags={(value, getTagProps) =>
                 value.map((option, index) => (
                   <Chip
+                    key={index}
                     className="option-chip"
                     deleteIcon={null}
                     sx={{ backgroundColor: option.color }}

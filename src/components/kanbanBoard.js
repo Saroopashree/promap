@@ -92,6 +92,7 @@ const KanbanBoard = ({ project, tasks, updateStatusInRecoil }) => {
                 <Box className="column-tasks">
                   {tasksByStatus[defn.name]?.map((task, index) => (
                     <TaskCard
+                      key={index}
                       task={task}
                       markDone={Boolean(defn.final)}
                       index={index}
