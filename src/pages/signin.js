@@ -1,19 +1,35 @@
 import { useMemo, useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { Box, Button, FormGroup, Tab, Tabs, TextField } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormGroup,
+  Tab,
+  Tabs,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { makeStyles, createStyles } from "@mui/styles";
 import apiService from "../services/apiService";
 import { useRecoilState } from "recoil";
 import { sessionTokenState } from "../recoil/atoms";
+import AdbIcon from "@mui/icons-material/Adb";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
     root: {
-      display: "grid",
-      placeItems: "center",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
       height: "100vh",
       width: "100vw",
+      "& .logo": {
+        marginBlock: theme.spacing(5),
+        display: "flex",
+        alignItems: "center",
+      },
       "& .container": {
         display: "flex",
         maxWidth: "60vw",
@@ -78,6 +94,30 @@ const SignIn = () => {
         <title>{pageTitle} | ProMap</title>
       </Head>
       <Box className={classes.root}>
+        <Box className="logo">
+          <AdbIcon
+            sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}
+            fontSize="large"
+            color="primary"
+          />
+          <Typography
+            variant="h6"
+            component="h5"
+            noWrap
+            sx={{
+              ml: 1,
+              display: { xs: "none", md: "flex" },
+              fontFamily: "monospace",
+              fontWeight: 600,
+              fontSize: "2rem",
+              letterSpacing: ".35rem",
+              color: "inherit",
+              textDecoration: "none",
+            }}
+          >
+            ProMap
+          </Typography>
+        </Box>
         <Box className="container">
           <Box>
             <Tabs

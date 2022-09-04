@@ -16,16 +16,14 @@ import ArrowDown from "@mui/icons-material/ArrowDropDown";
 import apiService, { clearAppContents } from "../services/apiService";
 import ProjectDialog from "../components/dialogs/project";
 import { useSnackbar } from "notistack";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
 import {
   allProjectsState,
   activeProjectIdState,
-  sessionTokenState,
   allPlansState,
   updateTaskNotifierState,
 } from "../recoil/atoms";
 import { currentUserName } from "../services/lsService";
-import { Place } from "@mui/icons-material";
 import PlanDialog from "../components/dialogs/plan";
 import TaskDialog from "../components/dialogs/task";
 import Link from "next/link";
