@@ -164,7 +164,8 @@ const Layout = ({ children }) => {
                 onClick={handleOpenProjectMenu}
               >
                 <Typography variant="h6">
-                  {projectIdAndName[activeProjectId]}
+                  {projectIdAndName[activeProjectId]}{" "}
+                  <ArrowDown sx={{ verticalAlign: "middle" }} />
                 </Typography>
               </span>
             )}

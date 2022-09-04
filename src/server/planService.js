@@ -21,15 +21,10 @@ class PlanService {
     ) {
       throw new BadRequestException();
     }
-
-    if (plan.color === undefined || /^#[0-9A-F]{6}$/i.test(plan.color)) {
-      plan.color = "#00D084";
-    }
-    return plan;
   }
 
   async createPlan(plan) {
-    plan = this.#validatePayload(plan);
+    this.#validatePayload(plan);
     const result = await this.#collection().insertOne({
       ...plan,
       nextTaskId: 1,
@@ -59,7 +54,7 @@ class PlanService {
   }
 
   async updatePlan(planId, plan) {
-    plan = this.#validatePayload(plan);
+    this.#validatePayload(plan);
     await this.#collection().updateOne(
       { _id: new ObjectId(planId) },
       { $set: plan }
