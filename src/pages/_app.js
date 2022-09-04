@@ -16,7 +16,7 @@ function MyApp({ Component, pageProps }) {
     : (page) => page;
 
   return (
-    <div style={{ backgroundColor: "#eee", height: "100vh" }}>
+    <div style={{ backgroundColor: "#eee", minHeight: "100vh" }}>
       <ThemeProvider theme={theme}>
         <RecoilRoot>
           <SnackbarProvider>
