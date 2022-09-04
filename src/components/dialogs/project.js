@@ -47,14 +47,24 @@ const ProjectDialog = (props) => {
 
   const [name, setName] = useState("");
   const [tag, setTag] = useState("");
-  const [lead, setLead] = useState("");
   const [description, setDescription] = useState("");
+  const [lead, setLead] = useState("");
   const [collaborators, setCollaborators] = useState([]);
 
   const [allUsers, setAllUsers] = useRecoilState(allUsersState);
 
+  const resetFields = () => {
+    setName("");
+    setTag("");
+    setDescription("");
+    setLead("");
+    setCollaborators([]);
+  };
+
   const handleCreate = () => {
     props.handleCreate({ name, description, tag, lead, collaborators });
+    props.handleClose();
+    resetFields();
   };
 
   useEffect(() => {

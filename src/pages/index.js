@@ -7,7 +7,7 @@ import Layout from "../theme/layout";
 import apiService from "../services/apiService";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {
-  activeProjectState,
+  activeProjectIdState,
   allProjectsState,
   allUsersState,
 } from "../recoil/atoms";
@@ -39,7 +39,8 @@ const Landing = () => {
   const router = useRouter();
 
   const [projects, setProjects] = useRecoilState(allProjectsState);
-  const [activeProject, setActiveProject] = useRecoilState(activeProjectState);
+  const [activeProjectId, setActiveProjectId] =
+    useRecoilState(activeProjectIdState);
   const allUsers = useRecoilValue(allUsersState);
 
   const leadUserName = useMemo(() => {
@@ -56,7 +57,7 @@ const Landing = () => {
 
   const gotoKanban = (projectId) => {
     localStorage.setItem("currentProject", projectId);
-    setActiveProject(projectId);
+    setActiveProjectId(projectId);
     router.push(`/kanban/${projectId}`);
   };
 

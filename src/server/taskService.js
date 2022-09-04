@@ -37,7 +37,9 @@ class TaskService {
 
   async listTasks(projectId, plans = null) {
     const query = { projectId };
-    if (plans !== null) query.planId = { $in: plans };
+    if (plans !== null) {
+      query.planId = { $in: plans };
+    }
 
     const results = await this.#collection().find(query).toArray();
     return results.map((task) => {

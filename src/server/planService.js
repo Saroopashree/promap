@@ -11,7 +11,7 @@ class PlanService {
     return this.#client.db("promap").collection("plans");
   }
 
-  async createPlan(plan) {
+  #validatePayload(plan) {
     if (
       plan.name === undefined ||
       plan.name === "" ||
@@ -22,6 +22,15 @@ class PlanService {
     ) {
       throw new BadRequestException();
     }
+
+    if (plan.color === undefined || /^#[0-9A-F]{6}$/i.test(plan.color)) {
+      plan.color = "#13A139";
+    }
+    return plan;
+  }
+
+  async createPlan(plan) {
+    plan = this.#validatePayload(plan);
     const result = await this.#collection().insertOne({
       ...plan,
       nextTaskId: 1,
@@ -29,8 +38,9 @@ class PlanService {
     return this.getPlanById(result.insertedId);
   }
 
-  async listPlans() {
-    const results = await this.#collection().find({}).toArray();
+  async listPlans(projectId) {
+    const query = projectId ? { projectId: projectId } : {};
+    const results = await this.#collection().find(query).toArray();
     return results.map((plan) => {
       const id = plan._id;
       delete plan._id;
@@ -50,18 +60,7 @@ class PlanService {
   }
 
   async updatePlan(planId, plan) {
-    if (
-      plan.name === undefined ||
-      plan.name === "" ||
-      plan.reporter === undefined ||
-      plan.reporter === "" ||
-      plan.projectId === undefined ||
-      plan.projectId === ""
-    ) {
-      throw new BadRequestException();
-    }
-
-    delete plan.nextTaskId;
+    plan = this.#validatePayload(plan);
     await this.#collection().updateOne(
       { _id: new ObjectId(planId) },
       { $set: plan }

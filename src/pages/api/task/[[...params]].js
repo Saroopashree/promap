@@ -1,41 +1,52 @@
-import { createHandler, Get, Put } from "next-api-decorators";
+import {
+  createHandler,
+  Get,
+  Param,
+  Put,
+  Post,
+  Delete,
+  Body,
+} from "next-api-decorators";
 import JwtAuthGuard from "../../../server/jwtAuthGuard";
 import mongo from "../../../server/mongo";
+import TaskService from "../../../server/taskService";
 
-class PlanRouter {
+class TaskRouter {
   constructor() {
-    this.planService = new PlanService(mongo);
+    this.taskService = new TaskService(mongo);
   }
 
   @Get()
   @JwtAuthGuard()
-  async listAllPlans() {
-    return await this.planService.listPlans();
+  async listAllTasks(@Param("projectId") projectId, @Param("plans") plans) {
+    plans = plans ? JSON.parse(plans) : null;
+    plans = plans && plans.length > 0 ? plans : null;
+    return await this.taskService.listTasks(projectId, plans);
   }
 
-  @Get("/:id")
+  @Get("/:key")
   @JwtAuthGuard()
-  async getPlanById(@Param("id") id) {
-    return await this.planService.getPlanById(id);
+  async getTaskByKey(@Param("key") key) {
+    return await this.taskService.getTaskByKey(key);
   }
 
   @Post()
   @JwtAuthGuard()
-  async createPlan(@Body() body) {
-    return await this.planService.createPlan(body);
+  async createTask(@Body() body) {
+    return await this.taskService.createTask(body);
   }
 
-  @Put()
+  @Put("/:key")
   @JwtAuthGuard()
-  async updatePlan(@Param("id") id, @Body() body) {
-    return await this.planService.updatePlan(id, body);
+  async updateTask(@Param("key") key, @Body() body) {
+    return await this.taskService.updateTask(key, body);
   }
 
-  @Delete()
+  @Delete("/:key")
   @JwtAuthGuard()
-  async deletePlan(@Param("id") id) {
-    return await this.planService.deletePlan(id);
+  async deleteTask(@Param("key") key) {
+    return await this.taskService.deleteTask(key);
   }
 }
 
-export default createHandler(PlanRouter);
+export default createHandler(TaskRouter);

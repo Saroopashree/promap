@@ -1,4 +1,12 @@
-import { createHandler, Get, Put } from "next-api-decorators";
+import {
+  createHandler,
+  Get,
+  Param,
+  Put,
+  Post,
+  Delete,
+  Body,
+} from "next-api-decorators";
 import JwtAuthGuard from "../../../server/jwtAuthGuard";
 import mongo from "../../../server/mongo";
 import PlanService from "../../../server/planService";
@@ -10,8 +18,8 @@ class PlanRouter {
 
   @Get()
   @JwtAuthGuard()
-  async listAllPlans() {
-    return await this.planService.listPlans();
+  async listAllPlans(@Param("projectId") projectId = null) {
+    return await this.planService.listPlans(projectId);
   }
 
   @Get("/:id")
@@ -26,13 +34,13 @@ class PlanRouter {
     return await this.planService.createPlan(body);
   }
 
-  @Put()
+  @Put("/:id")
   @JwtAuthGuard()
   async updatePlan(@Param("id") id, @Body() body) {
     return await this.planService.updatePlan(id, body);
   }
 
-  @Delete()
+  @Delete("/:id")
   @JwtAuthGuard()
   async deletePlan(@Param("id") id) {
     return await this.planService.deletePlan(id);

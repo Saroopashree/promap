@@ -5,7 +5,7 @@ import {
   allUsersState,
   sessionTokenState,
   allProjectsState,
-  activeProjectState,
+  activeProjectIdState,
   tasksInKanbanState,
 } from "../recoil/atoms";
 import { getSessionToken } from "./lsService";
@@ -19,7 +19,7 @@ export const clearAppContents = () => {
   setRecoil(allUsersState, []);
   setRecoil(sessionTokenState, null);
   setRecoil(allProjectsState, []);
-  setRecoil(activeProjectState, null);
+  setRecoil(activeProjectIdState, null);
   setRecoil(tasksInKanbanState, []);
 
   Router.push("/signin");
@@ -30,7 +30,9 @@ export const apiGet = (url, params) => {
   const token = getSessionToken();
   return new Promise((resolve, reject) =>
     axios
-      .get(url + urlParams, { headers: { authorization: `Bearer ${token}` } })
+      .get(url + "?" + urlParams, {
+        headers: { authorization: `Bearer ${token}` },
+      })
       .then((res) => {
         resolve(res);
       })
@@ -49,7 +51,7 @@ export const apiPost = (url, data, params) => {
   const token = getSessionToken();
   return new Promise((resolve, reject) =>
     axios
-      .post(url + urlParams, data, {
+      .post(url + "?" + urlParams, data, {
         headers: { authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -70,7 +72,7 @@ export const apiPut = (url, data, params) => {
   const token = getSessionToken();
   return new Promise((resolve, reject) =>
     axios
-      .put(url + urlParams, data, {
+      .put(url + "?" + urlParams, data, {
         headers: { authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -91,7 +93,7 @@ export const apiDelete = (url, params) => {
   const token = getSessionToken();
   return new Promise((resolve, reject) =>
     axios
-      .delete(url + urlParams, {
+      .delete(url + "?" + urlParams, {
         headers: { authorization: `Bearer ${token}` },
       })
       .then((res) => {

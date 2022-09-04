@@ -10,9 +10,11 @@ export const sessionTokenState = atom({
 
 export const allProjectsState = atom({ key: "allProjects", default: [] });
 
-export const activeProjectState = atom({
-  key: "activeProject",
+export const activeProjectIdState = atom({
+  key: "activeProjectId",
   default: null,
 });
+
+export const allPlansState = atom({ key: "allPlans", default: [] });
 
 export const tasksInKanbanState = atom({ key: "tasksInKanban", default: [] });

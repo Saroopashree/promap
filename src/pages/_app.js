@@ -5,7 +5,7 @@ import { RecoilRoot, useRecoilState } from "recoil";
 import { theme } from "../theme/theme";
 
 import "../../styles/globals.css";
-import { activeProjectState, sessionTokenState } from "../recoil/atoms";
+import { activeProjectIdState, sessionTokenState } from "../recoil/atoms";
 import { useEffect } from "react";
 import { getActiveProject, getSessionToken } from "../services/lsService";
 import RecoilNexus from "recoil-nexus";
@@ -32,7 +32,8 @@ function MyApp({ Component, pageProps }) {
 
 const RecoilInitializer = () => {
   const [token, setToken] = useRecoilState(sessionTokenState);
-  const [activeProject, setActiveProject] = useRecoilState(activeProjectState);
+  const [activeProject, setActiveProject] =
+    useRecoilState(activeProjectIdState);
 
   useEffect(() => {
     if (localStorage !== undefined) {

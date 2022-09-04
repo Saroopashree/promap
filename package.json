@@ -15,6 +15,7 @@
     "@mui/material": "^5.10.3",
     "@mui/styles": "^5.10.3",
     "axios": "^0.27.2",
+    "classnames": "^2.3.1",
     "dotenv": "^16.0.2",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.9.1",

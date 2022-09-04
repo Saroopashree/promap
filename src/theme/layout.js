@@ -20,7 +20,7 @@ import { useSnackbar } from "notistack";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {
   allProjectsState,
-  activeProjectState,
+  activeProjectIdState,
   sessionTokenState,
 } from "../recoil/atoms";
 import { currentUserName } from "../services/lsService";
@@ -37,6 +37,7 @@ const createItems = [
 const Layout = ({ children }) => {
   const { enqueueSnackbar } = useSnackbar();
 
+  const [username, setUsername] = useState("");
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [anchorElCreate, setAnchorElCreate] = useState(null);
@@ -44,10 +45,13 @@ const Layout = ({ children }) => {
   const [dialogType, setDialogType] = useState(null);
 
   const [projects, setProjects] = useRecoilState(allProjectsState);
-  const [activeProject, setActiveProject] = useRecoilState(activeProjectState);
+  const [activeProject, setActiveProject] =
+    useRecoilState(activeProjectIdState);
   const token = useRecoilValue(sessionTokenState);
 
-  const username = useMemo(() => currentUserName(), [token]);
+  useEffect(() => {
+    setUsername(currentUserName());
+  });
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
