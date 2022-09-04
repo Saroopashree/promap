@@ -19,7 +19,8 @@ class PlanRouter {
 
   @Get()
   @JwtAuthGuard()
-  async listAllPlans(@Query("projectId") projectId = null) {
+  async listAllPlans(@Query("projectId") projectId) {
+    console.log("projectId: ", projectId);
     return await this.planService.listPlans(projectId);
   }
 
