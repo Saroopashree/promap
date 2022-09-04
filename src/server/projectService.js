@@ -56,26 +56,29 @@ class ProjectService {
     if (project === null) return new NotFoundException("");
 
     await this.#collection().findOneAndUpdate(
-      { _id: new ObjectId(planId) },
-      { $inc: { nextTaskId: 1 } },
-      { returnOriginal: false }
+      { _id: new ObjectId(projectId) },
+      { $inc: { nextTaskId: 1 } }
     );
 
-    return `${project.tag}-${plan.nextTaskId}`;
+    return `${project.tag}-${project.nextTaskId}`;
   }
 
   async getDefaultStatus(projectId) {
     const project = await this.getProjectById(projectId);
     if (project === null) return new NotFoundException("");
 
-    const result = await this.#collection().aggregate([
-      { $match: { _id: ObjectId(projectId) } },
-      { $unwind: "$definitions" },
-      { $match: { "definitions.default": true } },
-      { $project: { _id: 0, "definitions.name": 1 } },
-    ]);
+    const cursor = await this.#collection().aggregate(
+      [
+        { $match: { _id: ObjectId(projectId) } },
+        { $unwind: "$definitions" },
+        { $match: { "definitions.default": true } },
+        { $project: { _id: 0, "definitions.name": 1 } },
+      ],
+      { cursor: { batchSize: 1 } }
+    );
 
-    return result.definitions.name;
+    const result = await cursor.toArray();
+    return result[0].definitions.name;
   }
 
   async deleteProject(projectId) {

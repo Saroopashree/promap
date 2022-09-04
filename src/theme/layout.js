@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AppBar,
   Box,
@@ -9,7 +9,6 @@ import {
   Menu,
   MenuItem,
   Button,
-  Tooltip,
   Avatar,
 } from "@mui/material";
 import AdbIcon from "@mui/icons-material/Adb";
@@ -22,8 +21,14 @@ import {
   allProjectsState,
   activeProjectIdState,
   sessionTokenState,
+  allPlansState,
+  updateTaskNotifierState,
 } from "../recoil/atoms";
 import { currentUserName } from "../services/lsService";
+import { Place } from "@mui/icons-material";
+import PlanDialog from "../components/dialogs/plan";
+import TaskDialog from "../components/dialogs/task";
+import Link from "next/link";
 
 const pages = [];
 const settings = [{ name: "Logout", value: "logout" }];
@@ -47,7 +52,10 @@ const Layout = ({ children }) => {
   const [projects, setProjects] = useRecoilState(allProjectsState);
   const [activeProject, setActiveProject] =
     useRecoilState(activeProjectIdState);
-  const token = useRecoilValue(sessionTokenState);
+  const [plans, setPlans] = useRecoilState(allPlansState);
+  const [updateTaskCount, setUpdateTaskCount] = useRecoilState(
+    updateTaskNotifierState
+  );
 
   useEffect(() => {
     setUsername(currentUserName());
@@ -82,31 +90,50 @@ const Layout = ({ children }) => {
     });
   };
 
+  const onCreatePlan = (plan) => {
+    apiService.post("/api/plan", plan).then((res) => {
+      enqueueSnackbar(`Plan ${res.data.name} created`, {
+        variant: "success",
+      });
+      setPlans([...plans, res.data]);
+    });
+  };
+
+  const onCreateTask = (task) => {
+    apiService.post("/api/task", task).then((res) => {
+      enqueueSnackbar(`Task created with key ${res.data.key}`, {
+        variant: "success",
+      });
+      setUpdateTaskCount((prev) => prev + 1);
+    });
+  };
+
   return (
     <Box>
       <AppBar position="sticky">
         <Container maxWidth="xl">
           <Toolbar disableGutters>
             <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
-            <Typography
-              variant="h6"
-              noWrap
-              component="a"
-              href="/"
-              sx={{
-                ml: 1,
-                mr: 4,
-                display: { xs: "none", md: "flex" },
-                fontFamily: "monospace",
-                fontWeight: 600,
-                fontSize: "1.5rem",
-                letterSpacing: ".35rem",
-                color: "inherit",
-                textDecoration: "none",
-              }}
-            >
-              ProMap
-            </Typography>
+            <Link href="/" style={{ cursor: "pointer" }}>
+              <Typography
+                variant="h6"
+                component="h5"
+                noWrap
+                sx={{
+                  ml: 1,
+                  mr: 4,
+                  display: { xs: "none", md: "flex" },
+                  fontFamily: "monospace",
+                  fontWeight: 600,
+                  fontSize: "1.5rem",
+                  letterSpacing: ".35rem",
+                  color: "inherit",
+                  textDecoration: "none",
+                }}
+              >
+                ProMap
+              </Typography>
+            </Link>
 
             {Boolean(activeProject) && (
               <Typography variant="h6">{activeProject.name}</Typography>
@@ -132,6 +159,7 @@ const Layout = ({ children }) => {
                   sx={{ width: 110 }}
                   key={item.value}
                   onClick={() => onCreateItemClick(item.value)}
+                  disabled={projects.length === 0}
                 >
                   {item.name}
                 </MenuItem>
@@ -197,6 +225,16 @@ const Layout = ({ children }) => {
         open={dialogType === "project"}
         handleClose={() => setDialogType(null)}
         handleCreate={onCreateProject}
+      />
+      <PlanDialog
+        open={dialogType === "plan"}
+        handleClose={() => setDialogType(null)}
+        handleCreate={onCreatePlan}
+      />
+      <TaskDialog
+        open={dialogType === "task"}
+        handleClose={() => setDialogType(null)}
+        handleCreate={onCreateTask}
       />
     </Box>
   );

@@ -18,3 +18,8 @@ export const activeProjectIdState = atom({
 export const allPlansState = atom({ key: "allPlans", default: [] });
 
 export const tasksInKanbanState = atom({ key: "tasksInKanban", default: [] });
+
+export const updateTaskNotifierState = atom({
+  key: "updateTaskNotifier",
+  default: 0,
+});

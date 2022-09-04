@@ -17,6 +17,7 @@ import {
   allPlansState,
   allProjectsState,
   tasksInKanbanState,
+  updateTaskNotifierState,
 } from "../../recoil/atoms";
 import apiService from "../../services/apiService";
 import Layout from "../../theme/layout";
@@ -60,9 +61,8 @@ const KanbanScreen = () => {
   // Recoil States and Values
   const [allPlans, setAllPlans] = useRecoilState(allPlansState);
   const [tasksInBoard, setTasksInBoard] = useRecoilState(tasksInKanbanState);
-
-  const allProjects = useRecoilValue(allProjectsState);
-  // const activeProjectId = useRecoilValue(activeProjectIdState);
+  const [allProjects, setAllProjects] = useRecoilState(allProjectsState);
+  const updateTaskNotifier = useRecoilValue(updateTaskNotifierState);
 
   const activeProject = useMemo(() => {
     return allProjects.find((proj) => proj.id === projectId);
@@ -73,6 +73,14 @@ const KanbanScreen = () => {
       activeProject ? activeProject.name + " | Kanban" : "Kanban | ProMap",
     [activeProject]
   );
+
+  useEffect(() => {
+    if (allProjects.length === 0) {
+      apiService.get("/api/project").then((res) => {
+        setAllProjects(res.data);
+      });
+    }
+  }, []);
 
   useEffect(() => {
     apiService.get("/api/plan", { projectId: projectId }).then((res) => {
@@ -89,7 +97,15 @@ const KanbanScreen = () => {
       .then((res) => {
         setTasksInBoard(res.data);
       });
-  }, [projectId, filteredPlans]);
+  }, [projectId, filteredPlans, updateTaskNotifier]);
+
+  const updateTaskStatusInRecoil = (taskKey, newStatus) => {
+    let newTasks = [...tasksInBoard];
+    const taskIndex = newTasks.findIndex((task) => task.key === taskKey);
+    const task = { ...newTasks[taskIndex], status: newStatus };
+    newTasks[taskIndex] = task;
+    setTasksInBoard(newTasks);
+  };
 
   return (
     <>
@@ -97,8 +113,8 @@ const KanbanScreen = () => {
         <title>{pageTitle}</title>
       </Head>
       <Box className={classes.root}>
-        <Typography component="h3" variant="h3">
-          {activeProject?.name} - Project Kanban Board
+        <Typography component="h4" variant="h4">
+          {activeProject?.name} - Kanban Board
         </Typography>
         <Box component="main">
           <Box className="plans-filter">
@@ -139,15 +155,19 @@ const KanbanScreen = () => {
                     deleteIcon={null}
                     sx={{ backgroundColor: option.color }}
                     label={option.name}
-                    {...getTagProps({ index })}
                   />
                 ))
               }
               sx={{ width: "600px", padding: "8px" }}
+              onChange={(e, v) => setFilteredPlans(v.map((i) => i.id))}
             />
           </Box>
           {Boolean(activeProject) && (
-            <KanbanBoard project={activeProject} tasks={tasksInBoard} />
+            <KanbanBoard
+              project={activeProject}
+              tasks={tasksInBoard}
+              updateStatusInRecoil={updateTaskStatusInRecoil}
+            />
           )}
         </Box>
       </Box>

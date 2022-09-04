@@ -1,5 +1,4 @@
-import { NotFoundException } from "next-api-decorators";
-import ProjectService from "./projectService";
+import { ObjectId } from "mongodb";
 
 class PlanService {
   #client;
@@ -24,7 +23,7 @@ class PlanService {
     }
 
     if (plan.color === undefined || /^#[0-9A-F]{6}$/i.test(plan.color)) {
-      plan.color = "#13A139";
+      plan.color = "#00D084";
     }
     return plan;
   }

@@ -67,7 +67,6 @@ class UserService {
       jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
       return true;
     } catch (err) {
-      console.log(err);
       return false;
     }
   }

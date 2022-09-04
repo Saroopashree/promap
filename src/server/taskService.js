@@ -17,28 +17,30 @@ class TaskService {
     if (
       task.name === undefined ||
       task.name === "" ||
-      task.reporter === undefined ||
-      task.reporter === "" ||
+      task.assignee === undefined ||
+      task.assignee === "" ||
       task.projectId === undefined ||
       task.projectId === ""
     ) {
       throw new BadRequestException();
     }
 
-    const taskKey = this.#projectService.getNextTaskKey(task.projectId);
-    const defaultStatus = this.#projectService.getDefaultStatus(task.projectId);
-    const result = await this.#collection().insertOne({
+    const taskKey = await this.#projectService.getNextTaskKey(task.projectId);
+    const defaultStatus = await this.#projectService.getDefaultStatus(
+      task.projectId
+    );
+    await this.#collection().insertOne({
       ...task,
       key: taskKey,
       status: defaultStatus,
     });
-    return this.getTaskByKey(result.key);
+    return this.getTaskByKey(taskKey);
   }
 
   async listTasks(projectId, plans = null) {
     const query = { projectId };
     if (plans !== null) {
-      query.planId = { $in: plans };
+      query.plan = { $in: plans };
     }
 
     const results = await this.#collection().find(query).toArray();
@@ -60,8 +62,8 @@ class TaskService {
     if (
       task.name === undefined ||
       task.name === "" ||
-      task.reporter === undefined ||
-      task.reporter === "" ||
+      task.assignee === undefined ||
+      task.assignee === "" ||
       task.projectId === undefined ||
       task.projectId === ""
     ) {
